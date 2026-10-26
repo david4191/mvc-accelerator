@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://mvc-accelerator.technosphereinnovations.com/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'https://mvc-accelerator.onrender.com/api';
 
 // Create axios instance with increased timeout (180 seconds)
 const api = axios.create({
@@ -197,7 +197,7 @@ export const register = async (username, fullname, email, password) => {
 export const logout = () => api.post('/logout');
 
 export const googleLogin = () => {
-    window.location.href = 'https://mvc-accelerator.technosphereinnovations.com/api/auth/google';
+    window.location.href = `${API_URL}/auth/google`;
 };
 
 export const refreshToken = async () => {

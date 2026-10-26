@@ -303,7 +303,7 @@ const Documentation = () => {
           'p',
           { className: 'text-sm text-gray-500 dark:text-[#9aa3af] mb-6' },
           'Base URL: ',
-          React.createElement('code', { className: 'font-mono text-[color:var(--accent)]' }, 'https://mvc-accelerator.technosphereinnovations.com/api'),
+          React.createElement('code', { className: 'font-mono text-[color:var(--accent)]' }, 'https://mvc-accelerator.onrender.com/api'),
           '. Endpoints marked "Auth" require a bearer token from /login; everything else is either public by design or rate-limited by IP.'
         ),
 

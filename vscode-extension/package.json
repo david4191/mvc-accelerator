@@ -81,7 +81,7 @@
       "properties": {
         "mvcAccelerator.apiUrl": {
           "type": "string",
-          "default": "https://mvc-accelerator.technosphereinnovations.com/api",
+          "default": "https://mvc-accelerator.onrender.com/api",
           "description": "Base URL of the MVC Accelerator API. Point this at http://localhost:8000 for local development."
         }
       }

@@ -30,6 +30,7 @@ In the Render service's **Environment** settings, add these values:
 | `APP_ENV` | `production` |
 | `APP_DEBUG` | `false` |
 | `APP_URL` | Your public application origin, including `https://` and no trailing slash. See the OAuth note below. |
+| `API_URL` | `https://mvc-accelerator.onrender.com` (backend origin, no trailing slash) |
 | `DB_HOST` | MySQL hostname from your provider |
 | `DB_PORT` | MySQL port, usually `3306` |
 | `DB_NAME` | MySQL database name |
@@ -45,16 +46,16 @@ Add the key for the generation provider you use: `DEEPSEEK_API_KEY`, `OPENAI_API
 
 ## 4. Connect the frontend and OAuth
 
-Set the frontend's `VITE_API_URL` to the deployed API base URL, ending in `/api`, for example `https://my-api.onrender.com/api`. This is a frontend build-time variable, so redeploy the frontend after changing it.
+The backend URL is `https://mvc-accelerator.onrender.com`. The frontend's default `VITE_API_URL` is now `https://mvc-accelerator.onrender.com/api`; set that value explicitly in the frontend hosting provider if needed. It is a frontend build-time variable, so redeploy the frontend after changing it.
 
 The backend's `.htaccess` currently includes a fixed `Access-Control-Allow-Origin` value. Update that origin in `api/.htaccess` to match the deployed frontend, as well as setting `CORS_ALLOWED_ORIGINS` in Render. Keep the allowed origin exact; do not use `*` with credentialed requests.
 
-Google OAuth currently derives both its callback URL and post-login frontend redirect from `APP_URL`. It expects a single public origin to serve the frontend and the API at `/api`. If the frontend and backend use different origins, OAuth callback/redirect configuration must be split in the application before Google sign-in will work. Register the callback URL shown by the deployed app in Google Cloud OAuth settings; with the current code it is `{APP_URL}/api/auth/google/callback`.
+Google OAuth uses `API_URL` for its callback and `APP_URL` for the post-login frontend redirect. Register `https://mvc-accelerator.onrender.com/api/auth/google/callback` as an authorized redirect URI in Google Cloud OAuth settings. Keep `APP_URL` set to the frontend origin and configure that origin in CORS.
 
 ## 5. Verify the deployment
 
-1. Open `https://<render-service>.onrender.com/health`; expect HTTP 200 and JSON with `"status":"healthy"`. This checks that Apache and the PHP API respond.
-2. Open `https://<render-service>.onrender.com/health/database`; expect HTTP 200 and `"database":"connected"`. An unavailable database returns HTTP 503 without exposing connection details.
+1. Open `https://mvc-accelerator.onrender.com/health`; expect HTTP 200 and JSON with `"status":"healthy"`. This checks that Apache and the PHP API respond.
+2. Open `https://mvc-accelerator.onrender.com/health/database`; expect HTTP 200 and `"database":"connected"`. An unavailable database returns HTTP 503 without exposing connection details.
 3. Check Render logs for startup or database connection errors. From the deployed frontend, test sign-in and one generation request. Browser CORS errors usually mean the frontend origin in `api/.htaccess` or `CORS_ALLOWED_ORIGINS` does not match exactly.
 4. Confirm database-backed data survives a new deploy. Files written under `/var/storage` use container-local storage by default; attach persistent storage and set `STORAGE_PATH` if the application needs those files to survive container replacement.
 

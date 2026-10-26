@@ -612,6 +612,10 @@ private function createTrialSubscription($userId) {
         return $stmt->fetch();
     }
     
+private function getApiBaseUrl() {
+    return rtrim($_ENV['API_URL'] ?? (getenv('API_URL') ?: 'https://mvc-accelerator.onrender.com'), '/');
+}
+
 /**
  * Google OAuth Login - Redirect to Google
  * GET /api/auth/google
@@ -623,7 +627,7 @@ public function googleLogin() {
     try {
         // Hardcoded credentials for testing
         $clientId = '33504210528-el2rft2qsopc1m5vd97vlrnaal6as6jd.apps.googleusercontent.com';
-        $redirectUri = 'https://mvc-accelerator.technosphereinnovations.com/api/auth/google/callback';
+        $redirectUri = $this->getApiBaseUrl() . '/api/auth/google/callback';
         
         error_log("Using Client ID: " . substr($clientId, 0, 10) . "...");
         error_log("Using Redirect URI: " . $redirectUri);
@@ -848,7 +852,7 @@ public function googleCallback() {
         $clientId = $_ENV['GOOGLE_CLIENT_ID'] ?? getenv('GOOGLE_CLIENT_ID');
         $clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'] ?? getenv('GOOGLE_CLIENT_SECRET');
         $appUrl = $_ENV['APP_URL'] ?? 'https://mvc-accelerator.technosphereinnovations.com';
-        $redirectUri = $appUrl . '/api/auth/google/callback';
+        $redirectUri = $this->getApiBaseUrl() . '/api/auth/google/callback';
         
         error_log("Exchanging code for token...");
         
@@ -958,7 +962,7 @@ public function googleCallback() {
 private function exchangeGoogleCode($code) {
     $clientId = $_ENV['GOOGLE_CLIENT_ID'] ?? getenv('GOOGLE_CLIENT_ID');
     $clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'] ?? getenv('GOOGLE_CLIENT_SECRET');
-    $redirectUri = ($_ENV['APP_URL'] ?? 'https://mvc-accelerator.technosphereinnovations.com') . '/api/auth/google/callback';
+    $redirectUri = $this->getApiBaseUrl() . '/api/auth/google/callback';
     
     error_log("Token Exchange - Starting");
     

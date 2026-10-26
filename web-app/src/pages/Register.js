@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { User, Mail, Lock, Eye, EyeOff, CheckCircle2, XCircle, ArrowRight, Code2 } from 'lucide-react';
-import { register as apiRegister } from '../services/api';
+import { API_URL, register as apiRegister } from '../services/api';
 import toast from 'react-hot-toast';
 
 const Register = () => {
@@ -206,7 +206,7 @@ const Register = () => {
   const handleGoogleRegister = () => {
     setGoogleLoading(true);
     toast.loading('Redirecting to Google...');
-    window.location.href = 'https://mvc-accelerator.technosphereinnovations.com/api/auth/google';
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   const passwordStrength = getPasswordStrength();

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completing Login - MVC Accelerator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4A5C3A;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .success {
+            color: #4A5C3A;
+            font-size: 48px;
+            margin: 20px 0;
+        }
+        .error {
+            color: #dc3545;
+            font-size: 48px;
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #4A5C3A;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .button:hover {
+            background: #6B7F55;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="loader" id="loader"></div>
+        <h2 id="title">Completing Login...</h2>
+        <p id="message">Please wait while we redirect you</p>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+        const userStr = urlParams.get('user');
+        const error = urlParams.get('error');
+
+        const container = document.getElementById('container');
+        const loader = document.getElementById('loader');
+        const title = document.getElementById('title');
+        const message = document.getElementById('message');
+
+        if (error) {
+            // Show error
+            loader.style.display = 'none';
+            container.innerHTML = `
+                <div class="error">❌</div>
+                <h2>Authentication Failed</h2>
+                <p>${decodeURIComponent(error)}</p>
+                <a href="/login" class="button">Return to Login</a>
+            `;
+        } else if (token && userStr) {
+            // Success - store data and redirect
+            try {
+                const user = JSON.parse(decodeURIComponent(userStr));
+                
+                // Store in localStorage
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(user));
+                localStorage.setItem('apiKey', user.api_key);
+                
+                // Update UI
+                loader.style.display = 'none';
+                container.innerHTML = `
+                    <div class="success">✓</div>
+                    <h2>Login Successful!</h2>
+                    <p>Welcome back, ${user.username || user.email}!</p>
+                    <p>Redirecting you to the generator...</p>
+                `;
+                
+                // Redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/generator';
+                }, 2000);
+                
+            } catch (e) {
+                console.error('Failed to parse user data:', e);
+                loader.style.display = 'none';
+                container.innerHTML = `
+                    <div class="error">❌</div>
+                    <h2>Error</h2>
+                    <p>Failed to process login data</p>
+                    <a href="/login" class="button">Return to Login</a>
+                `;
+            }
+        } else {
+            // No token - show error
+            loader.style.display = 'none';
+            container.innerHTML = `
+                <div class="error">❌</div>
+                <h2>Authentication Failed</h2>
+                <p>No authentication data received</p>
+                <a href="/login" class="button">Return to Login</a>
+            `;
+        }
+
+        // Also handle postMessage for popup windows
+        if (window.opener) {
+            if (token && userStr) {
+                window.opener.postMessage({
+                    type: 'oauth-success',
+                    token: token,
+                    user: JSON.parse(decodeURIComponent(userStr))
+                }, window.location.origin);
+                
+                setTimeout(() => window.close(), 1000);
+            } else if (error) {
+                window.opener.postMessage({
+                    type: 'oauth-error',
+                    error: decodeURIComponent(error)
+                }, window.location.origin);
+                
+                setTimeout(() => window.close(), 1000);
+            }
+        }
+    </script>
+</body>
+</html>

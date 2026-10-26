@@ -1,0 +1,255 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Futura+PT:wght@300;400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand accent: muted army green reads fine on light backgrounds but goes
+     muddy against near-black, so dark mode swaps to a more saturated green
+     that actually pops instead of reusing the light-mode value as-is. */
+  --accent: #4A5C3A;
+  --accent-hover: #6B7F55;
+  --accent-soft: rgba(74, 92, 58, 0.1);
+}
+
+.dark {
+  --accent: #16a34a;
+  --accent-hover: #22c55e;
+  --accent-soft: rgba(22, 163, 74, 0.15);
+}
+
+@layer base {
+  html {
+    font-family: 'Open Sans', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Futura PT', 'Open Sans', sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  body {
+    background-color: #f9fafb;
+  }
+
+  .dark body {
+    background-color: #0f1115;
+  }
+}
+
+/* Light-mode gradient background, matching the soft pastel reference look.
+   Hidden in dark mode in favor of a flat near-black surface. */
+.app-gradient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: #eef2ff;
+}
+
+.app-gradient-bg::before,
+.app-gradient-bg::after {
+  content: '';
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.55;
+}
+
+.app-gradient-bg::before {
+  top: -10%;
+  left: 10%;
+  background: radial-gradient(circle, #fca5a5 0%, #fde68a 45%, transparent 70%);
+}
+
+.app-gradient-bg::after {
+  bottom: -20%;
+  right: 5%;
+  background: radial-gradient(circle, #c4b5fd 0%, #93c5fd 50%, transparent 70%);
+}
+
+.dark .app-gradient-bg {
+  display: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1a1d23;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #3a3f4a;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4a4f5a;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Staged response reveal: each piece "unlocks" in turn */
+@keyframes revealIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-revealIn {
+  animation: revealIn 0.35s ease-out both;
+}
+
+/* Speech-bubble tail connecting the mascot avatar to its response text,
+   so the explanation reads as a character talking rather than plain copy. */
+.chat-bubble-tail {
+  position: relative;
+}
+
+.chat-bubble-tail::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: -6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid white;
+}
+
+.dark .chat-bubble-tail::before {
+  border-bottom-color: #1a1d23;
+}
+
+/* Three-dot pulse used while an AI response is generating */
+@keyframes dotPulse {
+  0%, 80%, 100% {
+    opacity: 0.25;
+    transform: scale(0.85);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.loading-dot {
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+
+/* Markdown styling - pre/code blocks are rendered via custom React components
+   (markdownComponents in Home.js/Generator.js) with proper light/dark Tailwind
+   classes, so this only needs to reset the default <pre>/<code> box styling,
+   never force a background - that used to be hardcoded dark unconditionally
+   here with !important, which broke light mode and fought the component's
+   own colors in dark mode. */
+.prose pre {
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  overflow-x: auto;
+  background: transparent;
+}
+
+.prose code {
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.375rem;
+  font-size: 0.875em;
+}
+
+.prose pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.prose h2 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #4A5C3A;
+}
+
+.dark .prose h2 {
+  color: #95a975;
+}
+
+.prose h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.dark .prose h3 {
+  color: #e5e7eb;
+}
+
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.prose li {
+  margin: 0.5rem 0;
+  color: #4b5563;
+}
+
+.dark .prose li {
+  color: #d1d5db;
+}
+
+.prose blockquote {
+  border-left: 4px solid #4A5C3A;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #6b7280;
+  margin: 1.5rem 0;
+}
+
+.dark .prose blockquote {
+  color: #9ca3af;
+}

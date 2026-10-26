@@ -1,12 +1,15 @@
 FROM php:8.3-apache
 
-RUN docker-php-ext-install pdo_mysql \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libcurl4-openssl-dev \
+    && docker-php-ext-install curl pdo_mysql \
+    && rm -rf /var/lib/apt/lists/* \
     && a2enmod rewrite headers \
     && printf '%s\n' '<Directory /var/www/html>' '    AllowOverride All' '</Directory>' \
         > /etc/apache2/conf-available/api.conf \
     && a2enconf api \
-    && mkdir -p /var/www/storage/logs /var/www/storage/cache \
-    && chown -R www-data:www-data /var/www/storage
+    && mkdir -p /var/storage/logs /var/storage/cache \
+    && chown -R www-data:www-data /var/storage
 
 COPY api/ /var/www/html/
 

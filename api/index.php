@@ -40,6 +40,31 @@ $router->get('/health', function() {
     exit;
 });
 
+$router->get('/health/database', function() {
+    header('Content-Type: application/json');
+
+    try {
+        $db = $GLOBALS['db'] ?? null;
+        if (!$db instanceof PDO) {
+            throw new RuntimeException('Database connection unavailable');
+        }
+
+        $db->query('SELECT 1');
+        $databaseHealthy = true;
+    } catch (Throwable $e) {
+        error_log('Database health check failed: ' . $e->getMessage());
+        $databaseHealthy = false;
+    }
+
+    http_response_code($databaseHealthy ? 200 : 503);
+    echo json_encode([
+        'status' => $databaseHealthy ? 'healthy' : 'unhealthy',
+        'database' => $databaseHealthy ? 'connected' : 'unavailable',
+        'timestamp' => time()
+    ]);
+    exit;
+});
+
 $router->post('/generate/preview', 'GenerationController@preview');
 
 // GOOGLE OAUTH ROUTES

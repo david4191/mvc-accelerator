@@ -53,9 +53,9 @@ Google OAuth currently derives both its callback URL and post-login frontend red
 
 ## 5. Verify the deployment
 
-1. Open `https://<render-service>.onrender.com/health`; expect JSON with `"status":"healthy"`.
-2. Check Render logs for startup or database connection errors. The health endpoint does not verify database connectivity, so test a database-backed flow too.
-3. From the deployed frontend, test sign-in and one generation request. Browser CORS errors usually mean the frontend origin in `api/.htaccess` or `CORS_ALLOWED_ORIGINS` does not match exactly.
+1. Open `https://<render-service>.onrender.com/health`; expect HTTP 200 and JSON with `"status":"healthy"`. This checks that Apache and the PHP API respond.
+2. Open `https://<render-service>.onrender.com/health/database`; expect HTTP 200 and `"database":"connected"`. An unavailable database returns HTTP 503 without exposing connection details.
+3. Check Render logs for startup or database connection errors. From the deployed frontend, test sign-in and one generation request. Browser CORS errors usually mean the frontend origin in `api/.htaccess` or `CORS_ALLOWED_ORIGINS` does not match exactly.
 4. Confirm database-backed data survives a new deploy. Files written under `/var/storage` use container-local storage by default; attach persistent storage and set `STORAGE_PATH` if the application needs those files to survive container replacement.
 
 Never commit production secrets or put them in the Docker image. Keep `APP_DEBUG=false` in production.

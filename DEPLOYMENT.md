@@ -31,6 +31,8 @@ In the Render service's **Environment** settings, add these values:
 | `APP_DEBUG` | `false` |
 | `APP_URL` | Your public application origin, including `https://` and no trailing slash. See the OAuth note below. |
 | `API_URL` | `https://mvc-accelerator.onrender.com` (backend origin, no trailing slash) |
+| `RESEND_API_KEY` | Resend API key used to send password-reset emails |
+| `MAIL_FROM_ADDRESS` | Verified sender, for example `MVC Accelerator <passwords@your-verified-domain.com>` |
 | `DB_HOST` | MySQL hostname from your provider |
 | `DB_PORT` | MySQL port, usually `3306` |
 | `DB_NAME` | MySQL database name |

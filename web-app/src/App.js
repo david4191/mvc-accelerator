@@ -7,6 +7,7 @@ import Sidebar from './components/Sidebar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Register from './pages/Register';
 import Generator from './pages/Generator';
 import Projects from './pages/Projects';
@@ -62,6 +63,7 @@ function App() {
           React.createElement(Route, { path: '/', element: React.createElement(Home, null) }),
           React.createElement(Route, { path: '/login', element: React.createElement(Login, null) }),
           React.createElement(Route, { path: '/forgot-password', element: React.createElement(ForgotPassword, null) }),
+          React.createElement(Route, { path: '/reset-password', element: React.createElement(ResetPassword, null) }),
           React.createElement(Route, { path: '/register', element: React.createElement(Register, null) }),
           React.createElement(Route, { path: '/health', element: React.createElement(Health, null) }),
           React.createElement(Route, { path: '/pricing', element: React.createElement(Pricing, null) }),

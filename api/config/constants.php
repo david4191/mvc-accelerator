@@ -29,6 +29,7 @@ define('MAX_PAGE_SIZE', 100);
 
 // Session Constants
 define('SESSION_LIFETIME', (int)(getenv('SESSION_LIFETIME') ?: 120));
+define('PASSWORD_RESET_EXPIRY', (int)(getenv('PASSWORD_RESET_TTL') ?: 3600));
 
 // Bcrypt Constants
 define('BCRYPT_ROUNDS', (int)(getenv('BCRYPT_ROUNDS') ?: 12));

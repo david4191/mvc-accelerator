@@ -99,8 +99,12 @@ class AuthService {
         return api.post('/forgot-password', { email });
     }
 
-    async resetPassword(token, password) {
-        return api.post('/reset-password', { token, password });
+    async resetPassword(token, password, confirmPassword) {
+        return api.post('/reset-password', {
+            token,
+            password,
+            confirm_password: confirmPassword
+        });
     }
 
     async verifyEmail(token) {

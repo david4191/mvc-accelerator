@@ -359,8 +359,9 @@ class AuthController extends Controller {
                 'message' => 'If the email exists, a reset link has been sent'
             ]);
             
-        } catch (Exception $e) {
-            return $this->json(['error' => $e->getMessage()], 500);
+        } catch (Throwable $e) {
+            error_log('Password reset request failed: ' . $e->getMessage());
+            return $this->json(['error' => 'Unable to process the password reset request right now. Please try again later.'], 500);
         }
     }
     
@@ -625,8 +626,10 @@ public function googleLogin() {
     error_log("========== GOOGLE LOGIN CALLED ==========");
     
     try {
-        // Hardcoded credentials for testing
-        $clientId = '33504210528-el2rft2qsopc1m5vd97vlrnaal6as6jd.apps.googleusercontent.com';
+        $clientId = $_ENV['GOOGLE_CLIENT_ID'] ?? getenv('GOOGLE_CLIENT_ID');
+        if (!$clientId) {
+            throw new RuntimeException('Google sign-in is not configured');
+        }
         $redirectUri = $this->getApiBaseUrl() . '/api/auth/google/callback';
         
         error_log("Using Client ID: " . substr($clientId, 0, 10) . "...");
@@ -745,6 +748,52 @@ private function generateUniqueUsername($name) {
     }
     
     return $username;
+}
+
+/**
+ * Send a password reset email through Resend.
+ */
+private function sendPasswordResetEmail($email, $token) {
+    $apiKey = $_ENV['RESEND_API_KEY'] ?? getenv('RESEND_API_KEY');
+    $from = $_ENV['MAIL_FROM_ADDRESS'] ?? getenv('MAIL_FROM_ADDRESS');
+    $appUrl = rtrim($_ENV['APP_URL'] ?? (getenv('APP_URL') ?: ''), '/');
+
+    if (!$apiKey || !$from || !$appUrl) {
+        throw new RuntimeException('Password reset email is not configured');
+    }
+
+    $resetUrl = $appUrl . '/reset-password?token=' . rawurlencode($token);
+    $safeUrl = htmlspecialchars($resetUrl, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $payload = [
+        'from' => $from,
+        'to' => [$email],
+        'subject' => 'Reset your MVC Accelerator password',
+        'html' => '<p>We received a request to reset your password.</p>' .
+            '<p><a href="' . $safeUrl . '">Reset your password</a></p>' .
+            '<p>This link expires in one hour. If you did not request this, you can ignore this email.</p>'
+    ];
+
+    $curl = curl_init('https://api.resend.com/emails');
+    curl_setopt_array($curl, [
+        CURLOPT_POST => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            'Authorization: Bearer ' . $apiKey,
+            'Content-Type: application/json'
+        ],
+        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_TIMEOUT => 15
+    ]);
+
+    $response = curl_exec($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($curl);
+    curl_close($curl);
+
+    if ($response === false || $httpCode < 200 || $httpCode >= 300) {
+        error_log('Password reset email delivery failed: ' . ($curlError ?: 'Resend HTTP ' . $httpCode));
+        throw new RuntimeException('Password reset email delivery failed');
+    }
 }
 
 /**
